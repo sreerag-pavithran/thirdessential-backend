@@ -1,5 +1,15 @@
 let Product = require("../models/product.model");
 
+// NPM Packages
+const cloudinary = require("cloudinary").v2;
+
+// Cloudinary Config
+cloudinary.config({
+  cloud_name: process.env.CLOUDNAME,
+  api_key: process.env.APIKEY,
+  api_secret: process.env.APISECRET,
+});
+
 let fetchProducts = async (req, res, next) => {
   try {
     const { isVendor, _id } = req.body;
@@ -73,7 +83,7 @@ let createProduct = async (req, res, next) => {
       });
       try {
         await newProduct.save();
-        let allProducts = await Product.find();
+        let allProducts = await Product.find({ vendor });
         return res.json({
           status: true,
           message: "Product added",
@@ -82,7 +92,7 @@ let createProduct = async (req, res, next) => {
       } catch (error) {
         console.log(error);
         return res.json({
-          status: true,
+          status: false,
           message: "Failed to add product",
         });
       }
