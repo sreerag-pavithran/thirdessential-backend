@@ -191,47 +191,93 @@ let isLoggedIn = async (req, res, next) => {
 
 let adminReport = async (req, res, next) => {
   try {
+    const { isVendor, _id } = req.body;
+
     let startDay = dayjs().startOf("day");
     let endDay = dayjs().endOf("day");
 
-    let totalProducts = await Product.find().countDocuments();
-    let totalUsers = await User.find().countDocuments();
+    if (isVendor === true) {
+      let totalProducts = await Product.find({ vendor: _id }).countDocuments();
+      let totalUsers = await User.find({ _id }).countDocuments();
 
-    let newProducts = await Product.find({
-      createdAt: { $gte: startDay, $lt: endDay },
-    }).countDocuments();
-    let newUsers = await User.find({
-      createdAt: { $gte: startDay, $lt: endDay },
-    }).countDocuments();
+      let newProducts = await Product.find({
+        createdAt: { $gte: startDay, $lt: endDay },
+        vendor: _id,
+      }).countDocuments();
+      let newUsers = await User.find({
+        _id,
+        createdAt: { $gte: startDay, $lt: endDay },
+      }).countDocuments();
 
-    try {
-      return res.json({
-        status: true,
-        message: "Reports fetched",
-        data: [
-          {
-            title: "Total products",
-            sub: "Total overall products",
-            value: totalProducts,
-          },
-          {
-            title: "Total users",
-            sub: "Total overall users",
-            value: totalUsers,
-          },
-          { title: "New users", sub: "New users today", value: newUsers },
-          {
-            title: "New Products",
-            sub: "New products today",
-            value: newProducts,
-          },
-        ],
-      });
-    } catch (error) {
-      return res.json({
-        status: false,
-        message: "Failed to fetch report",
-      });
+      try {
+        return res.json({
+          status: true,
+          message: "Reports fetched",
+          data: [
+            {
+              title: "Total products",
+              sub: "Total overall products",
+              value: totalProducts,
+            },
+            {
+              title: "Total users",
+              sub: "Total overall users",
+              value: totalUsers,
+            },
+            { title: "New users", sub: "New users today", value: newUsers },
+            {
+              title: "New Products",
+              sub: "New products today",
+              value: newProducts,
+            },
+          ],
+        });
+      } catch (error) {
+        return res.json({
+          status: false,
+          message: "Failed to fetch report",
+        });
+      }
+    } else {
+      let totalProducts = await Product.find().countDocuments();
+      let totalUsers = await User.find().countDocuments();
+
+      let newProducts = await Product.find({
+        createdAt: { $gte: startDay, $lt: endDay },
+      }).countDocuments();
+      let newUsers = await User.find({
+        createdAt: { $gte: startDay, $lt: endDay },
+      }).countDocuments();
+
+      try {
+        return res.json({
+          status: true,
+          message: "Reports fetched",
+          data: [
+            {
+              title: "Total products",
+              sub: "Total overall products",
+              value: totalProducts,
+            },
+            {
+              title: "Total users",
+              sub: "Total overall users",
+              value: totalUsers,
+            },
+            { title: "New users", sub: "New users today", value: newUsers },
+            {
+              title: "New Products",
+              sub: "New products today",
+              value: newProducts,
+            },
+          ],
+        });
+      } catch (error) {
+        return res.json({
+          status: false,
+          message: "Failed to fetch report",
+        });
+      }
     }
   } catch (error) {
     console.log(error);

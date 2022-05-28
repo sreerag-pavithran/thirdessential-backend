@@ -14,4 +14,10 @@ router.post("/create-user", userController.CreateUser);
 // Fetch Users
 router.post("/fetch-users", userController.fetchUsers);
 
+// User Login
+router.post("/login", userController.UserLogin);
+
+// User IsLoggedIn
+router.post("/isloggedin", userController.isLoggedIn);
+
 module.exports = router;

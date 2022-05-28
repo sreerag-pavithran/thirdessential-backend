@@ -2,18 +2,37 @@ let Product = require("../models/product.model");
 
 let fetchProducts = async (req, res, next) => {
   try {
-    let fetchProducts = await Product.find().populate("vendor");
-    try {
-      return res.json({
-        status: true,
-        message: "Products Fetched!",
-        data: fetchProducts,
-      });
-    } catch (error) {
-      return res.json({
-        status: false,
-        message: "Failed to fetch products!",
-      });
+    const { isVendor, _id } = req.body;
+    if (isVendor === true) {
+      let fetchProducts = await Product.find({ vendor: _id }).populate(
+        "vendor"
+      );
+      try {
+        return res.json({
+          status: true,
+          message: "Products Fetched!",
+          data: fetchProducts,
+        });
+      } catch (error) {
+        return res.json({
+          status: false,
+          message: "Failed to fetch products!",
+        });
+      }
+    } else {
+      let fetchProducts = await Product.find().populate("vendor");
+      try {
+        return res.json({
+          status: true,
+          message: "Products Fetched!",
+          data: fetchProducts,
+        });
+      } catch (error) {
+        return res.json({
+          status: false,
+          message: "Failed to fetch products!",
+        });
+      }
     }
   } catch (error) {
     return res.status(500).json({
