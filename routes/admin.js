@@ -14,4 +14,7 @@ router.post("/signup", adminController.AdminSignUp);
 // Admin Login
 router.post("/login", adminController.AdminLogin);
 
+// Admin isLoggedIn
+router.post("/isloggedin", adminController.isLoggedIn);
+
 module.exports = router;
