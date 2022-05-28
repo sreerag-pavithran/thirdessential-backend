@@ -4,6 +4,9 @@ const Admin = require("../models/admin.model");
 // NPM Packages
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Product = require("../models/product.model");
+const User = require("../models/user.model");
+const dayjs = require("dayjs");
 
 // Bcrypt Salt Count
 const salt = 10;
@@ -186,8 +189,62 @@ let isLoggedIn = async (req, res, next) => {
   }
 };
 
+let adminReport = async (req, res, next) => {
+  try {
+    let startDay = dayjs().startOf("day");
+    let endDay = dayjs().endOf("day");
+
+    let totalProducts = await Product.find().countDocuments();
+    let totalUsers = await User.find().countDocuments();
+
+    let newProducts = await Product.find({
+      createdAt: { $gte: startDay, $lt: endDay },
+    }).countDocuments();
+    let newUsers = await User.find({
+      createdAt: { $gte: startDay, $lt: endDay },
+    }).countDocuments();
+
+    try {
+      return res.json({
+        status: true,
+        message: "Reports fetched",
+        data: [
+          {
+            title: "Total products",
+            sub: "Total overall products",
+            value: totalProducts,
+          },
+          {
+            title: "Total users",
+            sub: "Total overall users",
+            value: totalUsers,
+          },
+          { title: "New users", sub: "New users today", value: newUsers },
+          {
+            title: "New Products",
+            sub: "New products today",
+            value: newProducts,
+          },
+        ],
+      });
+    } catch (error) {
+      return res.json({
+        status: false,
+        message: "Failed to fetch report",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: false,
+      message: "Bad Request",
+    });
+  }
+};
+
 module.exports = {
   AdminSignUp,
   AdminLogin,
   isLoggedIn,
+  adminReport,
 };
