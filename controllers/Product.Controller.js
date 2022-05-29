@@ -132,10 +132,12 @@ let updateProduct = async (req, res, next) => {
         updatedProduct = {
           ...req.body,
           media: imageUrls,
+          updatedAt: Date.now(),
         };
       } else {
         updatedProduct = {
           ...req.body,
+          updatedAt: Date.now(),
         };
       }
       const updated = await Product.findByIdAndUpdate(
@@ -143,7 +145,7 @@ let updateProduct = async (req, res, next) => {
         updatedProduct,
         { new: true, runValidators: true }
       );
-      const allProducts = await Product.find();
+      const allProducts = await Product.find({ vendor: updated?.vendor });
       try {
         return res.json({
           status: true,
@@ -169,19 +171,23 @@ let updateProduct = async (req, res, next) => {
 let deleteProduct = async (req, res, next) => {
   try {
     const _id = req.body._id;
+    let findVendor = await Product.findById({ _id });
     await Product.findByIdAndDelete(_id);
-    let fetchProducts = await Product.find();
-    try {
-      return res.json({
-        status: true,
-        message: "Product deleted",
-        data: fetchProducts,
-      });
-    } catch (error) {
-      return res.json({
-        status: true,
-        message: "Failed to delete product",
-      });
+    console.log(findVendor);
+    if (findVendor) {
+      let fetchProducts = await Product.find({ vendor: findVendor?.vendor });
+      try {
+        return res.json({
+          status: true,
+          message: "Product deleted",
+          data: fetchProducts,
+        });
+      } catch (error) {
+        return res.json({
+          status: true,
+          message: "Failed to delete product",
+        });
+      }
     }
   } catch (error) {
     return res.status(500).json({
