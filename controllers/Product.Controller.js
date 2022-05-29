@@ -173,9 +173,22 @@ let deleteProduct = async (req, res, next) => {
     const _id = req.body._id;
     let findVendor = await Product.findById({ _id });
     await Product.findByIdAndDelete(_id);
-    console.log(findVendor);
     if (findVendor) {
       let fetchProducts = await Product.find({ vendor: findVendor?.vendor });
+      try {
+        return res.json({
+          status: true,
+          message: "Product deleted",
+          data: fetchProducts,
+        });
+      } catch (error) {
+        return res.json({
+          status: true,
+          message: "Failed to delete product",
+        });
+      }
+    } else {
+      let fetchProducts = await Product.find();
       try {
         return res.json({
           status: true,
