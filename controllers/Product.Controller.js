@@ -171,10 +171,10 @@ let updateProduct = async (req, res, next) => {
 let deleteProduct = async (req, res, next) => {
   try {
     const _id = req.body._id;
-    let findVendor = await Product.findById({ _id });
+    const vendor = req.body.vendor;
     await Product.findByIdAndDelete(_id);
-    if (findVendor) {
-      let fetchProducts = await Product.find({ vendor: findVendor?.vendor });
+    if (vendor) {
+      let fetchProducts = await Product.find({ vendor });
       try {
         return res.json({
           status: true,
@@ -189,6 +189,7 @@ let deleteProduct = async (req, res, next) => {
       }
     } else {
       let fetchProducts = await Product.find();
+      console.log(fetchProducts);
       try {
         return res.json({
           status: true,
@@ -203,6 +204,7 @@ let deleteProduct = async (req, res, next) => {
       }
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: false,
       message: "Bad Request",
